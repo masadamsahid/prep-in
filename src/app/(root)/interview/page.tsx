@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 
 type Props = {}
 
-const InterviewPage = async (props: Props) => {
+const InterviewsPage = async (props: Props) => {
 
   const user = await getCurrentUser() as User;
 
@@ -15,4 +15,4 @@ const InterviewPage = async (props: Props) => {
   );
 }
 
-export default InterviewPage;
+export default InterviewsPage;
