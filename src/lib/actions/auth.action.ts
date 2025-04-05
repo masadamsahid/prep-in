@@ -11,7 +11,7 @@ export async function signUp(params: SignUpParams) {
   try {
     const userRecord = await db.collection('users').doc(uid).get();
 
-    if(userRecord.exists) {
+    if (userRecord.exists) {
       return {
         success: false,
         message: 'User already exists. Please sign-in instead.',
@@ -31,7 +31,7 @@ export async function signUp(params: SignUpParams) {
   } catch (error: any) {
     console.error('Error creating a user', error);
 
-    if(error.code === 'auth/email-already-exists') {
+    if (error.code === 'auth/email-already-exists') {
       return {
         success: false,
         message: 'Email already in use',
@@ -42,7 +42,7 @@ export async function signUp(params: SignUpParams) {
       success: false,
       message: 'Failed to create an account',
     }
-    
+
   }
 }
 
@@ -52,7 +52,7 @@ export async function signIn(params: SignInParams) {
   try {
     const userRecord = await auth.getUserByEmail(email);
 
-    if(!userRecord) {
+    if (!userRecord) {
       return {
         success: false,
         message: 'User does not exist. Please sign up instead.',
@@ -72,7 +72,7 @@ export async function signIn(params: SignInParams) {
       success: false,
       message: 'Failed to sign in to an account.',
     }
-    
+
   }
 }
 
@@ -96,7 +96,7 @@ export async function getCurrentUser(): Promise<User | null> {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('session')?.value;
 
-  if(!sessionCookie) return null;
+  if (!sessionCookie) return null;
 
   try {
     const decodedClaims = await auth.verifySessionCookie(sessionCookie);
@@ -104,7 +104,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
     const userRecord = await db.collection('users').doc(uid).get();
 
-    if(!userRecord.exists) return null;
+    if (!userRecord.exists) return null;
 
     return {
       ...userRecord.data(),
@@ -120,4 +120,42 @@ export async function isAuthenticated() {
   const user = await getCurrentUser();
 
   return !!user;
+}
+
+export async function getInterviewsByUserId(userId: string): Promise<Interview[] | null> {
+  const interviews = await db
+    .collection('interviews')
+    .where('userId', '==', userId)
+    .orderBy('createdAt', 'desc')
+    .get()
+  ;
+
+  if (interviews.empty) return null;
+
+  return interviews.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  })) as Interview[];
+}
+
+
+export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null> {
+  const { userId, limit = 20 } = params;
+
+
+  const interviews = await db
+    .collection('interviews')
+    .where('finalized', '==', true)
+    .where('userId', '!=', userId)
+    .orderBy('createdAt', 'desc')
+    .limit(limit)
+    .get()
+    ;
+
+  if (interviews.empty) return null;
+
+  return interviews.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  })) as Interview[];
 }

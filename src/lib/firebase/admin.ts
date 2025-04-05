@@ -6,8 +6,8 @@ import { getFirestore } from 'firebase-admin/firestore';
 const initFirebaseAdmin = () => {
   const apps = getApps();
 
-  console.log("RAW:", process.env.FIREBASE_PRIVATE_KEY);
-  console.log("PROCESSED:", process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"));
+  // console.log("RAW:", process.env.FIREBASE_PRIVATE_KEY);
+  // console.log("PROCESSED:", process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"));
   
 
   if (!apps.length) {
