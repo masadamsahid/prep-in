@@ -13,6 +13,7 @@ const InterviewPage = async ({ params }: Props) => {
   const { id } = await params;
 
   const user = await getCurrentUser();
+  if(!user) return redirect('/sign-in');
 
   const interview = await getInterviewById(id);
 
@@ -42,7 +43,7 @@ const InterviewPage = async ({ params }: Props) => {
       </div>
 
       <Agent
-        userName={user?.name!}
+        userName={user?.name || ""}
         userId={user?.id}
         interviewId={id}
         type="interview"
